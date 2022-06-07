@@ -88,7 +88,7 @@ ping()->
 %%          {stop, Reason}
 %% --------------------------------------------------------------------
 init([]) ->
-      nodelog_server:log(notice,?MODULE_STRING,?LINE,{"Server started  ",?MODULE}),
+    
     {ok, #state{}
     }.
 
