@@ -61,17 +61,17 @@ reduce(Parent,F1,F2,Acc0,L)->
   %  io:format("~p~n",[{?MODULE,?LINE,N}]),
     Dict0=dict:new(),
     Dict1=collect_replies(N,Dict0),
-%    io:format("~p~n",[{?MODULE,?LINE,Dict1}]),
+  %  io:format("~p~n",[{?MODULE,?LINE,Dict1}]),
     Acc = dict:fold(F2, Acc0,Dict1),
     Parent!{self(),Acc}.
 
 collect_replies(0,Dict)->
     Dict;
 collect_replies(N,Dict) ->
- %   io:format("N= ~p~n",[{?MODULE,?LINE,N}]),
+   %io:format("N= ~p~n",[{?MODULE,?LINE,N}]),
     receive
 	{Key,Value}->
-	%    io:format("~p~n",[{?MODULE,?LINE,Key,Value}]),
+           io:format("~p~n",[{?MODULE,?LINE,Key,Value}]),
 	    case dict:is_key(Key,Dict) of
 		true->
 		    Dict1=dict:append(Key,Value,Dict),
@@ -81,10 +81,10 @@ collect_replies(N,Dict) ->
 		    collect_replies(N,Dict1)
 		end;
 	{'EXIT',_,_Why} ->
-	%    io:format("~p~n",[{?MODULE,?LINE,Why,Dict}]),
+       %    io:format("~p~n",[{?MODULE,?LINE,Why,Dict}]),
 	    collect_replies(N-1,Dict)
     end.
 	    
 do_job(ReducePid, F, X)->
- %   io:format("Do job ~p~n",[{?MODULE,?LINE,F,X}]),
+%   io:format("Do job ~p~n",[{?MODULE,?LINE,F,X}]),
     F(ReducePid,X).

@@ -25,17 +25,47 @@
 start()->
     ok=application:start(common),
     pong=common_server:ping(),
- 
+    
+    ok=map_test(),
+
 %    init:stop(),
     ok.
+
+
+
+%% --------------------------------------------------------------------
+%% Function: available_hosts()
+%% Description: Based on hosts.config file checks which hosts are avaible
+%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
+%% --------------------------------------------------------------------
+map_test()->
+ 
+    F1 = fun square/2,
+    F2 = fun sum/3,
+    L=[1,2,3,4,5,6,7,8,9],
+    [{R,sqr}]=common:mapreduce(F1,F2,[],L),
+    io:format(" R ~p~n",[R]).
+
+
+
+square(Pid,Tal)->
+    Pid!{sqr,Tal*Tal}.
+
+
+
+sum(Key,Vals,Acc)->
+    [{Vals,Key}|Acc].
+    
+
 
 setup()->
   
     % Simulate host
-    R=rpc:call(node(),test_nodes,start_nodes,[],2000),
+  %  R=rpc:call(node(),test_nodes,start_nodes,[],2000),
 %    [Vm1|_]=test_nodes:get_nodes(),
 
 %    Ebin="ebin",
  %   true=rpc:call(Vm1,code,add_path,[Ebin],5000),
  
-    R.
+   % R.
+    ok.
