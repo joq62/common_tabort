@@ -1,90 +1,176 @@
--module(common).
+%%% -------------------------------------------------------------------
+%%% Author  : uabjle
+%%% Description : resource discovery accroding to OPT in Action 
+%%% This service discovery is adapted to 
+%%% Type = application 
+%%% Instance ={ip_addr,{IP_addr,Port}}|{erlang_node,{ErlNode}}
+%%% 
+%%% Created : 10 dec 2012
+%%% -------------------------------------------------------------------
+-module(common).  
+
+-behaviour(gen_server). 
+
+%% --------------------------------------------------------------------
+%% Include files
+%% --------------------------------------------------------------------
 
 
+%% --------------------------------------------------------------------
+-define(SERVER,?MODULE).
 
--import(lists, [foreach/2]).
--include_lib("stdlib/include/qlc.hrl").
 
--export([mapreduce/4,
-	 qsort/1,
-	 node_2_id/1
+%% External exports
+-export([
+	 appl_start/1,
+	 ping/0
 	]).
 
 
+-export([
+	 start/0,
+	 stop/0
+	]).
 
+
+-export([init/1, handle_call/3,handle_cast/2, handle_info/2, terminate/2, code_change/3]).
+
+-record(state, {
+	
+	       }).
+
+%% ====================================================================
+%% External functions
+%% ====================================================================
+appl_start([])->
+    application:start(?MODULE).
+
+%% ====================================================================
+%% Server functions
+%% ====================================================================
+%% Gen server functions
+
+start()-> gen_server:start_link({local, ?SERVER}, ?SERVER, [], []).
+stop()-> gen_server:call(?SERVER, {stop},infinity).
+
+%% ====================================================================
+%% Application handling
+%% ====================================================================
+
+%% ====================================================================
+%% Support functions
+%% ====================================================================
+%%---------------------------------------------------------------
+%% Function:all_specs()
+%% @doc: all service specs infromation       
+%% @param: non 
+%% @returns:State#state.service_specs_info
+%%
+%%---------------------------------------------------------------
+
+
+%% 
+%% @doc:check if service is running
+%% @param: non
+%% @returns:{pong,node,module}|{badrpc,Reason}
+%%
+-spec ping()-> {atom(),node(),module()}|{atom(),term()}.
+ping()-> 
+    gen_server:call(?SERVER, {ping},infinity).
+
+%% ====================================================================
+%% Gen Server functions
+%% ====================================================================
+%% --------------------------------------------------------------------
+%% Function: init/1
+%% Description: Initiates the server
+%% Returns: {ok, State}          |
+%%          {ok, State, Timeout} |
+%%          ignore               |
+%%          {stop, Reason}
+%% --------------------------------------------------------------------
+init([]) ->
+    
+    {ok, #state{}
+    }.
 
 %% --------------------------------------------------------------------
-%% Function:tes cases
-%% Description: List of test cases 
-%% Returns: non
+%% Function: handle_call/3
+%% Description: Handling call messages
+%% Returns: {reply, Reply, State}          |
+%%          {reply, Reply, State, Timeout} |
+%%          {noreply, State}               |
+%%          {noreply, State, Timeout}      |
+%%          {stop, Reason, Reply, State}   | (terminate/2 is called)
+%%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-qsort([Pivot|T]) ->
-    qsort([ X || X <- T, X < Pivot]) ++
-    [Pivot] ++
-    qsort([ X || X <- T, X >= Pivot]);
-qsort([]) -> [].
 
+
+
+
+handle_call({ping},_From, State) ->
+    Reply=pong,
+    {reply, Reply, State};
+
+handle_call({stopped},_From, State) ->
+    Reply=ok,
+    {reply, Reply, State};
+
+
+handle_call({not_implemented},_From, State) ->
+    Reply=not_implemented,
+    {reply, Reply, State};
+
+handle_call({stop}, _From, State) ->
+    {stop, normal, shutdown_ok, State};
+
+handle_call(Request, From, State) ->
+    %rpc:cast(node(),log,log,[?Log_ticket("unmatched call",[Request, From])]),
+    Reply = {ticket,"unmatched call",Request, From},
+    {reply, Reply, State}.
 
 %% --------------------------------------------------------------------
-%% Function:start/0 
-%% Description: Initiate the eunit tests, set upp needed processes etc
-%% Returns: non
+%% Function: handle_cast/2
+%% Description: Handling cast messages
+%% Returns: {noreply, State}          |
+%%          {noreply, State, Timeout} |
+%%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-node_2_id(Node)->
-    NodeStr=atom_to_list(Node),
-    [VmId,HostId]=string:lexemes(NodeStr,"@"),
-    {VmId,HostId}.
 
+
+handle_cast(_Msg, State) ->
+  %  rpc:cast(node(),log,log,[?Log_ticket("unmatched cast",[Msg])]),
+    {noreply, State}.
 
 %% --------------------------------------------------------------------
-%% Function:mapreduce/0 
-%% Description: Initiate the eunit tests, set upp needed processes etc
-%% Returns: non
+%% Function: handle_info/2
+%% Description: Handling all non call/cast messages
+%% Returns: {noreply, State}          |
+%%          {noreply, State, Timeout} |
+%%          {stop, Reason, State}            (terminate/2 is called)
 %% --------------------------------------------------------------------
-mapreduce(F1,F2,Acc0,L)->
-    S=self(),
-    Pid=spawn(fun()->
-		      reduce(S,F1,F2,Acc0,L) end),
-    receive
-	{Pid,Result}->
-	    Result
-    end.
+handle_info(_Info, State) ->
+    %rpc:cast(node(),log,log,[?Log_ticket("unmatched info",[Info])]),
+    {noreply, State}.
 
-reduce(Parent,F1,F2,Acc0,L)->
-    process_flag(trap_exit,true),
-    ReducePid=self(),
-    foreach(fun(X)->
-		    spawn_link(fun()->
-				       do_job(ReducePid,F1,X) end)
-	    end, L),
-    N=length(L),
-  %  io:format("~p~n",[{?MODULE,?LINE,N}]),
-    Dict0=dict:new(),
-    Dict1=collect_replies(N,Dict0),
-  %  io:format("~p~n",[{?MODULE,?LINE,Dict1}]),
-    Acc = dict:fold(F2, Acc0,Dict1),
-    Parent!{self(),Acc}.
+%% --------------------------------------------------------------------
+%% Function: terminate/2
+%% Description: Shutdown the server
+%% Returns: any (ignored by gen_server)
+%% --------------------------------------------------------------------
+terminate(_Reason, _State) ->
+    ok.
 
-collect_replies(0,Dict)->
-    Dict;
-collect_replies(N,Dict) ->
-   %io:format("N= ~p~n",[{?MODULE,?LINE,N}]),
-    receive
-	{Key,Value}->
-           io:format("~p~n",[{?MODULE,?LINE,Key,Value}]),
-	    case dict:is_key(Key,Dict) of
-		true->
-		    Dict1=dict:append(Key,Value,Dict),
-		    collect_replies(N,Dict1);
-		false ->
-		    Dict1=dict:store(Key,[Value],Dict),
-		    collect_replies(N,Dict1)
-		end;
-	{'EXIT',_,_Why} ->
-       %    io:format("~p~n",[{?MODULE,?LINE,Why,Dict}]),
-	    collect_replies(N-1,Dict)
-    end.
-	    
-do_job(ReducePid, F, X)->
-%   io:format("Do job ~p~n",[{?MODULE,?LINE,F,X}]),
-    F(ReducePid,X).
+%% --------------------------------------------------------------------
+%% Func: code_change/3
+%% Purpose: Convert process state when code is changed
+%% Returns: {ok, NewState}
+%% --------------------------------------------------------------------
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
+
+%% --------------------------------------------------------------------
+%%% Internal functions
+%% --------------------------------------------------------------------
+
+		  
