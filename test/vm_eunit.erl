@@ -9,7 +9,7 @@
 %%% Pod consits beams from all services, app and app and sup erl.
 %%% The setup of envs is
 %%% -------------------------------------------------------------------
--module(basic_eunit).   
+-module(vm_eunit).   
  
 -export([start/0]).
 %% --------------------------------------------------------------------
@@ -22,13 +22,14 @@
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
 start()->
-%    ok=map_test(),
-%    ok=list_len(),
-%    ok=vm_eunit:start(),
-    ok=appl_eunit:start(),
+    {ok,NodeLocal,NodeDirLocal}=start_vm_local(),
+    ok=stop_vm_local(NodeLocal,NodeDirLocal),
+    ok=is_dir_ssh_test(),
+
+    {ok,NodeSsh,NodeDirSsh}=start_vm_ssh(),
+    ok=stop_vm_ssh(NodeSsh,NodeDirSsh),
     io:format("TEST OK! ~p~n",[?MODULE]),
     timer:sleep(1000),
-    init:stop(),
     ok.
 
 
@@ -58,43 +59,69 @@ start()->
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
-
+is_dir_ssh_test()->
+    
+    false=vm:is_dir_ssh("glurk",
+			{?Ip,?Port,?User,?Password,?TimeOut}),
+    true=vm:is_dir_ssh("erlang",
+			{?Ip,?Port,?User,?Password,?TimeOut}),
+    ok.
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
-list_len()->
-    L=[1,a,{34,z},"b",'kalle',<<"a">>],
-    6=list_length:start(L),
+start_vm_local()->
+
+    %% Create 
+    os:cmd("rm -rf "++?NodeDir),
+    file:make_dir(?NodeDir),
+    PaArgs=" "++?PaArgsInit,
+    {ok,Node}=vm:create(?HostName,?NodeDir,?NodeName,?Cookie,PaArgs,?EnvArgs),
+    ?Node=Node,
+    rpc:call(Node,application,start,[common]),
+    pong= rpc:call(Node,common,ping,[]),
+    {ok,test}=rpc:call(Node,application,get_env,[common,test_env]),
+    timer:sleep(2000),
+    {ok,Node,?NodeDir}.
+ 
+stop_vm_local(NodeLocal,NodeDirLocal)->
+    vm:delete(NodeLocal,NodeDirLocal),
+    false=filelib:is_dir(NodeDirLocal), 
     ok.
 
+%% --------------------------------------------------------------------
+%% Function: available_hosts()
+%% Description: Based on hosts.config file checks which hosts are avaible
+%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
+%% --------------------------------------------------------------------
+
+start_vm_ssh()->
+   %% Create local 
+    my_ssh:ssh_send(?Ip,?Port,?User,?Password,"rm -rf "++?NodeDir,?TimeOut),
+    my_ssh:ssh_send(?Ip,?Port,?User,?Password,"mkdir "++?NodeDir,?TimeOut),
+    
+    PaArgs=" "++?PaArgsInit,
+    {ok,Node}=vm:ssh_create(?HostName,?NodeName,?Cookie,PaArgs,?EnvArgs,
+			    {?Ip,?Port,?User,?Password,?TimeOut}),
+
+    ?Node=Node,
+    rpc:call(Node,application,start,[common]),
+    pong= rpc:call(Node,common,ping,[]),
+    {ok,test}=rpc:call(Node,application,get_env,[common,test_env]),
+    {ok,Node,?NodeDir}.
+
+
+stop_vm_ssh(NodeSsh,NodeDirSsh)->
+    vm:delete(NodeSsh),
+    my_ssh:ssh_send(?Ip,?Port,?User,?Password,"rm -rf "++NodeDirSsh,?TimeOut),
+    ok.
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
-map_test()->
- 
-    F1 = fun square/2,
-    F2 = fun sum/3,
-    L=[1,2,3,4,5,6,7,8,9],
-    [{R,sqr}]=mapreduce:start(F1,F2,[],L),
-    io:format(" R ~p~n",[R]).
-
-
-
-square(Pid,Tal)->
-    Pid!{sqr,Tal*Tal}.
-
-
-
-sum(Key,Vals,Acc)->
-    [{Vals,Key}|Acc].
-    
-
-
 setup()->
   
     % Simulate host
