@@ -55,7 +55,7 @@ dynamic_install([NodeToAdd|T],IntialNode)->
 	{ok,[NodeToAdd]}->
 	    {atomic,ok}=rpc:call(IntialNode,mnesia,change_table_copy_type,[schema,NodeToAdd,disc_copies]),
 	    Tables=rpc:call(IntialNode,mnesia,system_info,[tables]),	  
-	    [{atomic,_}=rpc:call(NodeToAdd,mnesia,add_table_copy,[Table,IntialNode,disc_copies])||Table<-Tables,
+	    [{atomic,_}=rpc:call(IntialNode,mnesia,add_table_copy,[Table,NodeToAdd,disc_copies])||Table<-Tables,
 											Table/=schema],
 	    rpc:call(IntialNode,mnesia,wait_for_tables,[Tables],20*1000),
 	    ok;
