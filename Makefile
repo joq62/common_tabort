@@ -1,6 +1,6 @@
 all:
 	rm -rf  *~ */*~  src/*.beam test/*.beam erl_cra*;
-	rm -rf  catalog host_specs deployment_specs logs *.service_dir;
+	rm -rf  Mnesia.* host_specs deployment_specs logs *.service_dir;
 	rm -rf _build test_ebin ebin;		
 	mkdir ebin;		
 	rebar3 compile;	

@@ -42,6 +42,9 @@
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
 start()->
+    os:cmd("rm -rf Mnesia.dbase1@c100"),
+    os:cmd("rm -rf Mnesia.dbase2@c100"),
+    os:cmd("rm -rf Mnesia.dbase3@c100"),    
 
     {ok,N1}=vm:create("c100","dbase1",?Cookie,?PaArgsInit,?EnvArgs),
     {ok,N2}=vm:create("c100","dbase2",?Cookie,?PaArgsInit,?EnvArgs),
@@ -49,7 +52,9 @@ start()->
  
     %% Inital 
     ok=rpc:call(N1,dbase_lib,dynamic_install_start,[N1],5000),
-    io:format("mnesia:system_info() ~p~n",[rpc:call(N1,mnesia,system_info,[[]]),
+    ok=rpc:call(N1,dbase_lib,dynamic_install,[[N2,N3],N1],5000),
+
+    io:format("mnesia:system_info() ~p~n",[rpc:call(N1,mnesia,system_info,[])]),
 
     %% 
     io:format("TEST OK! ~p~n",[?MODULE]),
