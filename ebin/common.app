@@ -5,7 +5,7 @@
               {mod,{common_app,[]}},
               {applications,[kernel,stdlib]},
               {env,[]},
-              {modules,[appl,common,common_app,common_sup,list_length,
-                        mapreduce,my_ssh,node_to_id,qsort,vm]},
+              {modules,[appl,common,common_app,common_sup,dbase_lib,
+                        list_length,mapreduce,my_ssh,node_to_id,qsort,vm]},
               {licenses,["Apache 2.0"]},
               {links,[]}]}.

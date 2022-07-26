@@ -25,7 +25,7 @@ start()->
 %    ok=map_test(),
 %    ok=list_len(),
 %    ok=vm_eunit:start(),
-    ok=appl_eunit:start(),
+    ok=dbase_eunit:start(),
     io:format("TEST OK! ~p~n",[?MODULE]),
     timer:sleep(1000),
     init:stop(),
