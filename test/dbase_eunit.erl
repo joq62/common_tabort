@@ -53,7 +53,6 @@ start()->
     %% Inital 
     ok=rpc:call(N1,dbase_lib,dynamic_install_start,[N1],5000),
     ok=rpc:call(N1,dbase_lib,dynamic_install,[[N2,N3],N1],5000),
-
     io:format("mnesia:system_info() ~p~n",[rpc:call(N1,mnesia,system_info,[])]),
 
     %% 
