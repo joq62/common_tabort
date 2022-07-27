@@ -36,12 +36,12 @@
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% --------------------------------------------------------------------
-git_clone_to_dir(Node,GitPath,BaseDir)->
+git_clone_to_dir(Node,GitPath,DirToClone)->
     case rpc:call(Node,file,get_cwd,[],5000) of  
 	{badrpc,Reason}->
 	    {error,[badrpc,Reason]};
 	  {ok,Root}->
-	    CloneDir=filename:join(Root,BaseDir),
+	    CloneDir=filename:join(Root,DirToClone),
 	    TempDir=filename:join(Root,"temp.dir"),
 	    []=rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) ,
 	    case rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) of
