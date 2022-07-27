@@ -51,7 +51,7 @@ git_clone_to_dir(Node,GitPath,BaseDir)->
 		    case rpc:call(Node,file,make_dir,[TempDir],5000) of
 			{badrpc,Reason}->
 			    {error,[badrpc,Reason]};
-			[]->
+			ok->
 			    case rpc:call(Node,os,cmd,["git clone "++GitPath++" "++TempDir],5000) of
 				{badrpc,Reason}->
 				    {error,[badrpc,Reason]};
