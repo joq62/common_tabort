@@ -42,8 +42,9 @@ git_clone_to_dir(Node,GitPath,DirToClone)->
 	    {error,[badrpc,Reason]};
 	  {ok,Root}->
 	    CloneDir=filename:join(Root,DirToClone),
+	    io:format("CloneDir ~p~n",[CloneDir]),
 	    TempDir=filename:join(Root,"temp.dir"),
-	    []=rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) ,
+	    io:format("TempDir ~p~n",[TempDir]),
 	    case rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) of
 		{badrpc,Reason}->
 		    {error,[badrpc,Reason]};
