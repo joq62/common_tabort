@@ -43,7 +43,7 @@ git_clone_to_dir(Node,GitPath,BaseDir)->
 	  {ok,Root}->
 	    CloneDir=filename:join(Root,BaseDir),
 	    TempDir=filename:join(Root,"temp.dir"),
-	    gl=rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) ,
+	    []=rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) ,
 	    case rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) of
 		{badrpc,Reason}->
 		    {error,[badrpc,Reason]};
