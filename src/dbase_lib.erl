@@ -53,7 +53,7 @@ dynamic_install([NodeToAdd|T],IntialNode)->
     ok=rpc:call(NodeToAdd,mnesia,start,[]),
     case rpc:call(IntialNode,mnesia,change_config,[extra_db_nodes,[NodeToAdd]],5000) of
 	{ok,[NodeToAdd]}->
-	    {atomic,ok}=rpc:call(IntialNode,mnesia,change_table_copy_type,[schema,NodeToAdd,disc_copies]),
+	    rpc:call(IntialNode,mnesia,change_table_copy_type,[schema,NodeToAdd,disc_copies]),
 	    Tables=rpc:call(IntialNode,mnesia,system_info,[tables]),	  
 	    [{atomic,_}=rpc:call(IntialNode,mnesia,add_table_copy,[Table,NodeToAdd,disc_copies])||Table<-Tables,
 											Table/=schema],
