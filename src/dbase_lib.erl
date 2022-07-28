@@ -106,31 +106,40 @@ dynamic_db_init([])->
 
  %   io:format(" ~p~n",[{node(),?FUNCTION_NAME,?MODULE,?LINE}]),
     mnesia:stop(),
-    mnesia:del_table_copy(schema,node()),
+  %  mnesia:del_table_copy(schema,node()),
     mnesia:delete_schema([node()]),
-    mnesia:create_schema([node()]),
+    mnesia:create_schema([]),
     mnesia:start(),   
     ok;
 
 dynamic_db_init([DbaseNode|T])->
-%    io:format("DbaseNode dynamic_db_init([DbaseNode|T]) ~p~n",[{DbaseNode,node(),?FUNCTION_NAME,?MODULE,?LINE}]),
-    mnesia:stop(),
-    mnesia:del_table_copy(schema,node()),
-    mnesia:delete_schema([node()]),
-    mnesia:start(),
+    io:format(" ~p~n",[{DbaseNode,node(),?FUNCTION_NAME,?MODULE,?LINE}]),
+  %  stopped=rpc:call(DbaseNode,mnesia,stop,[]),
+  %  ok=rpc:call(DbaseNode,mnesia,del_table_copy,[schema,DbaseNode]),
+  %  ok=rpc:call(DbaseNode,mnesia,delete_schema,[[DbaseNode]]),
+ %   ok=rpc:call(DbaseNode,mnesia,create,[]),
+ %   ok=rpc:call(DbaseNode,mnesia,start,[]),
+  %  mnesia:stop(),
+  %  mnesia:del_table_copy(schema,node()),
+  %  mnesia:delete_schema([node()]),
+    mnesia:create_schema([]),
+    mnesia:start(),   
 %io:format("DbaseNode dynamic_db_init([DbaseNode|T]) ~p~n",[{DbaseNode,node(),?FUNCTION_NAME,?MODULE,?LINE}]),
-    StorageType=disc_copies,
-  %  case rpc:call(DbaseNode,mnesia,change_config,[extra_db_nodes, [node()]],5000) of
+    StorageType=ram_copies,
     case rpc:call(node(),mnesia,change_config,[extra_db_nodes,[DbaseNode]],5000) of
-	{ok,[_AddedNode]}->
+	{ok,[DbaseNode]}->
+	    mnesia:add_table_copy(schema,node(),ram_copies),
 	    Tables=mnesia:system_info(tables),
-	    [mnesia:add_table_copy(Table, node(),StorageType)||Table<-Tables,
+	    R_add_table_copy=[mnesia:add_table_copy(Table, node(),StorageType)||Table<-Tables,
 							       Table/=schema],
+	    io:format(" R_add_table_copy ~p~n",[{ R_add_table_copy,?FUNCTION_NAME,?MODULE,?LINE}]),
 	    mnesia:wait_for_tables(Tables,20*1000),
 	    ok;
-	_Reason ->
-	    dynamic_db_init(T) 
+	Reason ->
+	    io:format("Reason ~p~n",[{Reason,?FUNCTION_NAME,?MODULE,?LINE}]),
+	    dynamic_db_init(T)
     end.
+  
 
 
 

@@ -51,10 +51,10 @@ start()->
     {ok,N3}=vm:create("c100","dbase3",?Cookie,?PaArgsInit,?EnvArgs),
  
     %% Inital 
-    ok=rpc:call(N1,dbase_lib,dynamic_install_start,[N1],5000),
-    ok=rpc:call(N1,dbase_lib,dynamic_install,[[N2,N3],N1],5000),
+    ok=rpc:call(N1,dbase_lib,dynamic_db_init,[[N3,N2,N1]],5000),
     io:format("mnesia:system_info() ~p~n",[rpc:call(N1,mnesia,system_info,[])]),
 
+  
     %% 
     io:format("TEST OK! ~p~n",[?MODULE]),
     timer:sleep(1000),
@@ -62,7 +62,16 @@ start()->
 
 
 
-
+t1()->
+    {ok,N1}=vm:create("c100","dbase1",?Cookie,?PaArgsInit,?EnvArgs),
+    {ok,N2}=vm:create("c100","dbase2",?Cookie,?PaArgsInit,?EnvArgs),
+    {ok,N3}=vm:create("c100","dbase3",?Cookie,?PaArgsInit,?EnvArgs),
+ 
+    %% Inital 
+    ok=rpc:call(N1,dbase_lib,dynamic_install_start,[N1],5000),
+    ok=rpc:call(N1,dbase_lib,dynamic_install,[[N2,N3],N1],5000),
+    io:format("mnesia:system_info() ~p~n",[rpc:call(N1,mnesia,system_info,[])]),
+    ok.
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
