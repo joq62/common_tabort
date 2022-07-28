@@ -44,7 +44,7 @@ dynamic_install_start(IntialNode)->
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% --------------------------------------------------------------------
-dynamic_install([],IntialNode)->
+dynamic_install([],_IntialNode)->
     ok;
 dynamic_install([NodeToAdd|T],IntialNode)->
     stopped=rpc:call(NodeToAdd,mnesia,stop,[]),
@@ -53,17 +53,17 @@ dynamic_install([NodeToAdd|T],IntialNode)->
     ok=rpc:call(NodeToAdd,mnesia,start,[]),
     case rpc:call(IntialNode,mnesia,change_config,[extra_db_nodes,[NodeToAdd]],5000) of
 	{ok,[NodeToAdd]}->
-	    rpc:call(IntialNode,mnesia,change_table_copy_type,[schema,NodeToAdd,disc_copies]),
+	    {atomic,_}=rpc:call(IntialNode,mnesia,change_table_copy_type,[schema,NodeToAdd,disc_copies]),
 	    Tables=rpc:call(IntialNode,mnesia,system_info,[tables]),	  
 	    [{atomic,_}=rpc:call(IntialNode,mnesia,add_table_copy,[Table,NodeToAdd,disc_copies])||Table<-Tables,
 											Table/=schema],
 	    rpc:call(IntialNode,mnesia,wait_for_tables,[Tables],20*1000),
 	    ok;
 	Reason ->
-	    io:format("NodeToAdd,IntialNode,Reason ~p~n",[{NodeToAdd,IntialNode,Reason,?FUNCTION_NAME,?MODULE,?LINE}])
-	  %  dynamic_install(T,IntialNode) 
-    end,
-    dynamic_install(T,IntialNode).
+	    io:format("NodeToAdd,IntialNode,Reason ~p~n",[{NodeToAdd,IntialNode,Reason,?FUNCTION_NAME,?MODULE,?LINE}]),
+	    dynamic_install(T,IntialNode) 
+    end.
+  %  dynamic_install(T,IntialNode).
 
 
 %% --------------------------------------------------------------------
