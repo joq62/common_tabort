@@ -22,17 +22,46 @@
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
 start()->
-    {ok,NodeLocal,NodeDirLocal}=start_vm_local(),
-    ok=stop_vm_local(NodeLocal,NodeDirLocal),
-    ok=is_dir_ssh_test(),
+    ok=local_vm:start(),
 
-    {ok,NodeSsh,NodeDirSsh}=start_vm_ssh(),
-    ok=stop_vm_ssh(NodeSsh,NodeDirSsh),
-    io:format("TEST OK! ~p~n",[?MODULE]),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
     timer:sleep(1000),
     ok.
 
 
+
+%% --------------------------------------------------------------------
+%% Function: available_hosts()
+%% Description: Based on hosts.config file checks which hosts are avaible
+%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
+%% --------------------------------------------------------------------
+local_test()->
+    {ok,HostName}=net:gethostname(),
+    ok=l1_test(HostName),
+    ok=l2_test(HostName),
+    ok.
+
+
+
+l2_test(HostName)->
+    N=list_to_atom("t"++"@"++HostName),
+    {ok,N}=vm:create_local("t"),
+    pong=net_adm:ping(N),
+    ok=vm:delete(N),
+    pang=net_adm:ping(N),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),  
+    ok.
+    
+l1_test(HostName)->
+
+    % 1. Start/stop vm     
+    N=list_to_atom("t"++"@"++HostName),
+    {ok,N}=vm:create_local("t"),
+    pong=net_adm:ping(N),
+    ok=vm:delete(N),
+    pang=net_adm:ping(N),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
+    ok.
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()

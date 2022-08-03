@@ -79,7 +79,6 @@ git_clone_to_dir(Node,GitPath,DirToClone)->
 %% Returns: non
 %% --------------------------------------------------------------------
 git_clone(Node,GitPath,GitDir)->
-
     case rpc:call(Node,filelib,is_dir,[GitDir],2000) of
 	{badrpc,Reason}->
 	    {error,[badrpc,Reason]};

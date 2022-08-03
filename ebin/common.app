@@ -6,6 +6,7 @@
               {applications,[kernel,stdlib]},
               {env,[]},
               {modules,[appl,common,common_app,common_sup,dbase_lib,
-                        list_length,mapreduce,my_ssh,node_to_id,qsort,vm]},
+                        list_length,local_vm,mapreduce,my_ssh,node_to_id,
+                        qsort,ssh_vm,vm]},
               {licenses,["Apache 2.0"]},
               {links,[]}]}.

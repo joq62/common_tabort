@@ -9,7 +9,7 @@
 %%% Pod consits beams from all services, app and app and sup erl.
 %%% The setup of envs is
 %%% -------------------------------------------------------------------
--module(basic_eunit).   
+-module(local_appl_test).   
  
 -export([start/0]).
 %% --------------------------------------------------------------------
@@ -23,10 +23,13 @@
 %% --------------------------------------------------------------------
 start()->
     ok=setup(),
-    ok=map_test(),
-    ok=list_len(),
-    
-    io:format("TEST OK! ~p~n",[?MODULE]),
+
+    {ok,HostName}=net:gethostname(),
+    ok=t1_test(HostName),
+ %   ok=t2_test(HostName),
+ %   ok=t3_test(HostName), 
+
+    io:format("TEST OK, there you go! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
     timer:sleep(1000),
     init:stop(),
     ok.
@@ -38,72 +41,83 @@ start()->
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
--define(Ip,"192.168.1.100").
--define(Port,22).
--define(User,"joq62").
--define(Password,"festum01").
--define(TimeOut,6000).
 
--define(HostName,"c100").
--define(NodeName,"TestVm").
--define(Node,'TestVm@c100').
--define(NodeDir,"test_vm_dir").
--define(Cookie,atom_to_list(erlang:get_cookie())).
--define(EnvArgs,"-common test_env test").
--define(PaArgsInit,"-pa /home/joq62/erlang/infra_2/common/ebin").
-
-
-%% --------------------------------------------------------------------
-%% Function: available_hosts()
-%% Description: Based on hosts.config file checks which hosts are avaible
-%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
-%% --------------------------------------------------------------------
-
-%% --------------------------------------------------------------------
-%% Function: available_hosts()
-%% Description: Based on hosts.config file checks which hosts are avaible
-%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
-%% --------------------------------------------------------------------
-list_len()->
-    L=[1,a,{34,z},"b",'kalle',<<"a">>],
-    6=list_length:start(L),
-    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
+t3_test(HostName)->
+    File=filename:basename(?FILE),
+    NodeDir="test",
+    N=list_to_atom("t"++"@"++HostName),
+    {ok,N}=local_vm:create_dir("t",NodeDir),
+    pong=net_adm:ping(N),
+    non_existing=code:where_is_file(File),
+    ?FILE=rpc:call(N,code,where_is_file,[File]),
+    ok=vm:delete(N),
+    pang=net_adm:ping(N),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),  
     ok.
-
-
-%% --------------------------------------------------------------------
-%% Function: available_hosts()
-%% Description: Based on hosts.config file checks which hosts are avaible
-%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
-%% --------------------------------------------------------------------
-map_test()->
- 
-    F1 = fun square/2,
-    F2 = fun sum/3,
-    L=[1,2,3,4,5,6,7,8,9],
-    [{[1,4,9,16,25,36,49,64,81],sqr}]=mapreduce:start(F1,F2,[],L),
-    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
-    ok.
-
-square(Pid,Tal)->
-    Pid!{sqr,Tal*Tal}.
-sum(Key,Vals,Acc)->
-    [{Vals,Key}|Acc].
     
+
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
 
-setup()->
-  
-    % Simulate host
-  %  R=rpc:call(node(),test_nodes,start_nodes,[],2000),
-%    [Vm1|_]=test_nodes:get_nodes(),
+t2_test(HostName)->
+    File=filename:basename(?FILE),
+    PaArgs="-pa test ",
+    EnvArgs=" ",
+    N=list_to_atom("t"++"@"++HostName),
+    {ok,N}=local_vm:create("t",PaArgs,EnvArgs),
+    pong=net_adm:ping(N),
+    non_existing=code:where_is_file(File),
+    ?FILE=rpc:call(N,code,where_is_file,[File]),
+    ok=vm:delete(N),
+    pang=net_adm:ping(N),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),  
+    ok.
+    
 
-%    Ebin="ebin",
- %   true=rpc:call(Vm1,code,add_path,[Ebin],5000),
- 
-   % R.
+%% --------------------------------------------------------------------
+%% Function: available_hosts()
+%% Description: Based on hosts.config file checks which hosts are avaible
+%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
+%% --------------------------------------------------------------------
+
+t1_test(HostName)->
+
+    % 1. Start/stop vm     
+    N=list_to_atom("t"++"@"++HostName),
+    {ok,N}=local_vm:create("t"),
+    pong=net_adm:ping(N),
+    %% Appl test
+    % Ensure that dir for sd not exists
+    GitPathSd=config:application_gitpath("sd.spec"),
+    GitDirSd="sd",
+    case rpc:call(N,filelib,is_dir,[GitDirSd]) of
+	true->
+	    []=rpc:call(N,os,cmd,["rm -rf "++GitDirSd]);
+	_->
+	    ok
+    end,
+    timer:sleep(3000),
+    {ok,GitDirSd}=appl:git_clone(N,GitPathSd,GitDirSd),
+    AppSd=sd,
+    PathsSd=["sd/ebin"],    
+    ok=appl:load(N,AppSd,PathsSd),
+    ok=appl:start(N,AppSd),
+    pong=rpc:call(N,sd,ping,[]),
+
+    ok=vm:delete(N,GitDirSd),
+    pang=net_adm:ping(N),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
+    ok.
+
+%% --------------------------------------------------------------------
+%% Function: available_hosts()
+%% Description: Based on hosts.config file checks which hosts are avaible
+%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
+%% --------------------------------------------------------------------
+setup()->
+    ok=application:start(config),
+
     ok.

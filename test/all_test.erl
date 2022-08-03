@@ -9,7 +9,7 @@
 %%% Pod consits beams from all services, app and app and sup erl.
 %%% The setup of envs is
 %%% -------------------------------------------------------------------
--module(basic_eunit).   
+-module(all_test).   
  
 -export([start/0]).
 %% --------------------------------------------------------------------
@@ -25,33 +25,12 @@ start()->
     ok=setup(),
     ok=map_test(),
     ok=list_len(),
-    
-    io:format("TEST OK! ~p~n",[?MODULE]),
+    ok=local_vm_test:start(),
+    ok=ssh_vm_test:start(),
+    io:format("TEST OK there you go!! ~p~n",[?MODULE]),
     timer:sleep(1000),
     init:stop(),
     ok.
-
-
-
-%% --------------------------------------------------------------------
-%% Function: available_hosts()
-%% Description: Based on hosts.config file checks which hosts are avaible
-%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
-%% --------------------------------------------------------------------
--define(Ip,"192.168.1.100").
--define(Port,22).
--define(User,"joq62").
--define(Password,"festum01").
--define(TimeOut,6000).
-
--define(HostName,"c100").
--define(NodeName,"TestVm").
--define(Node,'TestVm@c100').
--define(NodeDir,"test_vm_dir").
--define(Cookie,atom_to_list(erlang:get_cookie())).
--define(EnvArgs,"-common test_env test").
--define(PaArgsInit,"-pa /home/joq62/erlang/infra_2/common/ebin").
-
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
@@ -77,7 +56,6 @@ list_len()->
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
 map_test()->
- 
     F1 = fun square/2,
     F2 = fun sum/3,
     L=[1,2,3,4,5,6,7,8,9],

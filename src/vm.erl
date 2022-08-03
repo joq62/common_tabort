@@ -18,6 +18,13 @@
 %% --------------------------------------------------------------------
 %-compile(export_all).
 -export([
+	 create_local/1,
+	 create_local/3,
+	 create_local_dir/2,
+	 create_local_dir/4
+	]).
+	 	 
+-export([	 
 	 create/6,
 	 create/5,
 	 delete/1,
@@ -31,6 +38,49 @@
 %% ====================================================================
 %% External functions
 %% ====================================================================
+
+%% --------------------------------------------------------------------
+%% Function:start/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% --------------------------------------------------------------------
+create_local(NodeName)->
+    {ok,HostName}=net:gethostname(),
+    Cookie=atom_to_list(erlang:get_cookie()),
+    PaArgs=" ",
+    EnvArgs=" ",
+    create(HostName,NodeName,Cookie,PaArgs,EnvArgs).    
+
+create_local(NodeName,PaArgs,EnvArgs)->
+    {ok,HostName}=net:gethostname(),
+    Cookie=atom_to_list(erlang:get_cookie()),
+    create(HostName,NodeName,Cookie,PaArgs,EnvArgs).
+
+create_local_dir(NodeName,NodeDir)->
+    Reply=case create_local(NodeName) of
+	      {ok,SlaveNode}->
+		  case rpc:call(SlaveNode,code,add_patha,[NodeDir]) of
+		      {badrpc,Error}->
+			  {error,[badrpc,Error,SlaveNode]};
+		      {error,bad_directory}->
+			  {error,[bad_directory,NodeDir]};
+		      true-> {ok,SlaveNode}
+		  end
+	  end,
+    Reply.
+
+create_local_dir(NodeName,NodeDir,PaArgs,EnvArgs)->
+    Reply=case create_local(NodeName,PaArgs,EnvArgs) of
+	      {ok,SlaveNode}->
+		  case rpc:call(SlaveNode,code,add_patha,[NodeDir]) of
+		      {badrpc,Error}->
+			  {error,[badrpc,Error,SlaveNode]};
+		      {error,bad_directory}->
+			  {error,[bad_directory,NodeDir]};
+		      true-> {ok,SlaveNode}
+		  end
+	  end,
+    Reply.
 
 %% --------------------------------------------------------------------
 %% Function:start/0 

@@ -102,6 +102,8 @@ restart()->
     mnesia:start().   
 
 
+
+
 dynamic_db_init([])->
 
  %   io:format(" ~p~n",[{node(),?FUNCTION_NAME,?MODULE,?LINE}]),

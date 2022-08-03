@@ -22,9 +22,7 @@ eunit:
 	rebar3 compile;
 	cp _build/default/lib/*/ebin/* ebin;
 	erlc -o test_ebin test/*.erl;
-	erl -pa ebin -pa test_ebin -sname test -run basic_eunit start -setcookie test_cookie 
-release:
-	rm -rf  *~ */*~  test_ebin erl_cra*;
-	mkdir test_ebin;
-	erlc -o test_ebin test/*.erl;
-	erl -pa test_ebin -run release start sd_app ../catalog/catalog.specs
+	erl -pa ebin -pa test_ebin\
+	    -pa /home/joq62/erlang/infra_2/config/ebin\
+            -pa /home/joq62/erlang/*\
+            -sname common_test -run $(m) start -setcookie cookie_test
