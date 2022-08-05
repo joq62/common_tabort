@@ -115,7 +115,7 @@ load(Node,App,Paths)->
 		{badrpc,Reason}->
 		    {error,[badrpc,Reason,App]};
 		{error, Reason}->
-		    {error, Reason,App};
+		    {error, [Reason,App]};
 		ok->
 		    ok
 	    end;
