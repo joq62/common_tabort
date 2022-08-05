@@ -59,6 +59,7 @@ create_dir(HostName,NodeName,NodeDir,
 %% --------------------------------------------------------------------
 create_dir(HostName,NodeName,NodeDir,Cookie,PaArgs,EnvArgs,
        {Ip,SshPort,Uid,Pwd,TimeOut})->
+    true=erlang:set_cookie(node(), list_to_atom(Cookie)),   
     my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"rm -rf "++NodeDir,TimeOut),
     my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"mkdir "++NodeDir,TimeOut),
     create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
