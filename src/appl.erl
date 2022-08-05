@@ -43,7 +43,7 @@ git_clone_to_dir(Node,GitPath,DirToClone)->
 	  {ok,Root}->
 	    CloneDir=filename:join(Root,DirToClone),
 	 %   io:format("CloneDir ~p~n",[CloneDir]),
-	    TempDirName=erlang:integer_to_list(os:system_time(microsecond,36))++".dir",
+	    TempDirName=erlang:integer_to_list(os:system_time(microsecond),36)++".dir",
 	    TempDir=filename:join(Root,TempDirName),
 	  %  io:format("TempDir ~p~n",[TempDir]),
 	    case rpc:call(Node,os,cmd,["rm -rf "++TempDir],5000) of
