@@ -26,8 +26,6 @@
 	 delete/2,
 	 create/3,
 	 create/6,
-	 create_dir/4,
-	 create_dir/7,
 	 is_dir/2
 	]).
 	 
@@ -35,35 +33,6 @@
 %% ====================================================================
 %% External functions
 %% ====================================================================
-
-%% --------------------------------------------------------------------
-%% Function:start/0 
-%% Description: Initiate the eunit tests, set upp needed processes etc
-%% Returns: non
-%% --------------------------------------------------------------------
-create_dir(HostName,NodeName,NodeDir,
-	   {Ip,SshPort,Uid,Pwd,TimeOut})->
-    Cookie=atom_to_list(erlang:get_cookie()),
-    PaArgs=" ",
-    EnvArgs=" ",
-    my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"rm -rf "++NodeDir,TimeOut),
-    my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"mkdir "++NodeDir,TimeOut),
-
-    create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
-	   {Ip,SshPort,Uid,Pwd,TimeOut}).
-
-%% --------------------------------------------------------------------
-%% Function:start/0 
-%% Description: Initiate the eunit tests, set upp needed processes etc
-%% Returns: non
-%% --------------------------------------------------------------------
-create_dir(HostName,NodeName,NodeDir,Cookie,PaArgs,EnvArgs,
-       {Ip,SshPort,Uid,Pwd,TimeOut})->
-    true=erlang:set_cookie(node(), list_to_atom(Cookie)),   
-    my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"rm -rf "++NodeDir,TimeOut),
-    my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"mkdir "++NodeDir,TimeOut),
-    create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
-	   {Ip,SshPort,Uid,Pwd,TimeOut}).
 
 
 %% --------------------------------------------------------------------
@@ -84,6 +53,7 @@ create(HostName,NodeName,{Ip,SshPort,Uid,Pwd,TimeOut})->
 %% -------------------------------------------------------------------	
 create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
 	   {Ip,SshPort,Uid,Pwd,TimeOut})->
+    true=erlang:set_cookie(node(), list_to_atom(Cookie)),   
     Node=list_to_atom(NodeName++"@"++HostName),
     rpc:call(Node,init,stop,[],5000),
     true=check_stopped_node(100,Node,false),
