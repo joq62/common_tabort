@@ -26,6 +26,8 @@
 	 delete/2,
 	 create/3,
 	 create/6,
+	 create_dir/2,
+	 delete_dir/2,
 	 is_dir/2
 	]).
 	 
@@ -76,7 +78,46 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
     Result.
 
 
+%% --------------------------------------------------------------------
+%% Function:start/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% --------------------------------------------------------------------
+delete_dir(HostName,Dir)->
+    Ip=config:host_local_ip(HostName),
+    SshPort=config:host_ssh_port(HostName),
+    Uid=config:host_uid(HostName),
+    Pwd=config:host_passwd(HostName),
+    TimeOut=5000,
+    my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"rm -rf "++Dir,TimeOut),
+    case ssh_vm:is_dir(Dir,{Ip,SshPort,Uid,Pwd,TimeOut}) of
+	false->
+	    {ok,Dir};
+	true ->
+	    {error,["failed to delete ",HostName,Dir,?MODULE,?FUNCTION_NAME,?LINE]}
+    end.
 
+%% --------------------------------------------------------------------
+%% Function:start/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% --------------------------------------------------------------------
+create_dir(HostName,Dir)->
+    
+    Ip=config:host_local_ip(HostName),
+    SshPort=config:host_ssh_port(HostName),
+    Uid=config:host_uid(HostName),
+    Pwd=config:host_passwd(HostName),
+    TimeOut=5000,
+    my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"rm -rf "++Dir,TimeOut),
+    my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"mkdir "++Dir,TimeOut),
+    timer:sleep(2000),
+    case ssh_vm:is_dir(Dir,{Ip,SshPort,Uid,Pwd,TimeOut}) of
+	true->
+	    {ok,Dir};
+	false ->
+	    {error,["failed to create ",Dir,?MODULE,?FUNCTION_NAME,?LINE]}
+    end.
 %% --------------------------------------------------------------------
 %% Function:start/0 
 %% Description: Initiate the eunit tests, set upp needed processes etc
