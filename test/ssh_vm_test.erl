@@ -54,10 +54,13 @@ t4_test(HostName)->
     PaArgs="-pa erlang ",
     EnvArgs=" ",  
   
+    ssh_vm:delete_dir(HostName,NodeDir),
+    ssh_vm:create_dir(HostName,NodeDir),
+   
     File="test.file",
     FilewPath="erlang/test.file",
     N=list_to_atom("t"++"@"++HostName),
-    {ok,N}=ssh_vm:create_dir(HostName,NodeName,NodeDir,Cookie,PaArgs,EnvArgs,
+    {ok,N}=ssh_vm:create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
 			 {Ip,Port,Uid,Passwd,TimeOut}),
     pong=net_adm:ping(N),
     non_existing=code:where_is_file(File),
@@ -82,9 +85,12 @@ t3_test(HostName)->
     TimeOut=5000,
     NodeName="t",
     NodeDir="ssh_vm_test.dir",
+     
+    ssh_vm:delete_dir(HostName,NodeDir),
+    ssh_vm:create_dir(HostName,NodeDir),
    
     N=list_to_atom("t"++"@"++HostName),
-    {ok,N}=ssh_vm:create_dir(HostName,NodeName,NodeDir,
+    {ok,N}=ssh_vm:create(HostName,NodeName,
 			 {Ip,Port,Uid,Passwd,TimeOut}),
     pong=net_adm:ping(N),
     true=rpc:call(N,filelib,is_dir,[NodeDir]),

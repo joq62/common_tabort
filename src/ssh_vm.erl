@@ -18,7 +18,8 @@
 %% --------------------------------------------------------------------
 %-compile(export_all).
 -export([
-	 
+	 create_dir/2,
+	 delete_dir/2	 
 	]).
 	 	 
 -export([
@@ -26,8 +27,7 @@
 	 delete/2,
 	 create/3,
 	 create/6,
-	 create_dir/2,
-	 delete_dir/2,
+
 	 is_dir/2
 	]).
 	 
