@@ -27,7 +27,7 @@ start()->
     ok=setup(),
     
     "config"=common:config_nodename(),
-    config=common:config_cookie(),
+    "config"=common:config_cookie(),
     
    
 

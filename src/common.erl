@@ -69,7 +69,7 @@ config_nodename()->
     ?ConfigNodeName.
 
 config_cookie()->
-    list_to_atom(?ConfigCookieStr).
+    ?ConfigCookieStr.
     
 
 
