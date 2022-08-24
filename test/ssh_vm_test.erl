@@ -30,11 +30,31 @@ start()->
     ok=t3_test(HostName), 
     ok=t4_test(HostName), 
 
+    ok=hidden_test(HostName), 
+
     io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
     timer:sleep(1000),
     ok.
 
 
+%% --------------------------------------------------------------------
+%% Function: available_hosts()
+%% Description: Based on hosts.config file checks which hosts are avaible
+%% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
+%% --------------------------------------------------------------------
+hidden_test(HostName)->
+    NodeName="my_hidden",
+    Cookie="hidden_cookie",
+    PaArgs=" ",
+    EnvArgs=" -hidden ",
+   
+    N=list_to_atom(NodeName++"@"++HostName),
+    {ok,N}= ssh_vm:create(HostName,NodeName,Cookie,PaArgs,EnvArgs),
+    pong=net_adm:ping(N),
+    ok=vm:delete(N),
+    pang=net_adm:ping(N),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
+    ok.
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()

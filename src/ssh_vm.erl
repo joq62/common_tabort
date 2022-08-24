@@ -26,6 +26,7 @@
 	 delete/1,
 	 delete/2,
 	 create/3,
+	 create/5,
 	 create/6,
 
 	 is_dir/2
@@ -48,6 +49,40 @@ create(HostName,NodeName,{Ip,SshPort,Uid,Pwd,TimeOut})->
     EnvArgs=" ",
     create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
 	   {Ip,SshPort,Uid,Pwd,TimeOut}).
+%% --------------------------------------------------------------------
+%% Function:start/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% -------------------------------------------------------------------	
+create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
+    Ip=config:host_local_ip(HostName),
+    SshPort=config:host_ssh_port(HostName),
+    Uid=config:host_uid(HostName),
+    Pwd=config:host_passwd(HostName),
+    TimeOut=5000,
+    
+    Node=list_to_atom(NodeName++"@"++HostName),
+    rpc:call(Node,init,stop,[],5000),
+    true=check_stopped_node(100,Node,false),
+    Args=PaArgs++" "++"-setcookie "++Cookie++" "++EnvArgs,
+    Msg="erl -sname "++NodeName++" "++Args++" "++"-detached", 
+    
+    Result=case rpc:call(node(),my_ssh,ssh_send,[Ip,SshPort,Uid,Pwd,Msg,TimeOut],TimeOut-1000) of
+	     % {badrpc,timeout}-> retry X times       
+	       {badrpc,Reason}->
+		   {error,[{?MODULE,?LINE," ",badrpc,Reason}]};
+	       _Return->
+		   erlang:set_cookie(Node,list_to_atom(Cookie)),
+		   case check_started_node(100,Node,false) of
+		       false->
+			   rpc:call(Node,init,stop,[],5000),
+			   {error,[{?MODULE,?LINE," ",couldnt_connect,Node}]};
+		       true->
+			   {ok,Node}
+		   end
+	   end,
+    Result.
+
 %% --------------------------------------------------------------------
 %% Function:start/0 
 %% Description: Initiate the eunit tests, set upp needed processes etc
