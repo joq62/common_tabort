@@ -23,7 +23,7 @@
 %% External exports
 -export([
 	 appl_start/1,
-	 config_node/0,
+	 config_nodename/0,
 	 config_cookie/0,
 	 ping/0
 	]).
@@ -65,9 +65,8 @@ stop()-> gen_server:call(?SERVER, {stop},infinity).
 -define(ConfigNodeName,"config").
 -define(ConfigCookieStr,"config").
 
-config_node()->
-    {ok,HostName}=net:gethostname(),
-    list_to_atom(?ConfigNodeName++"@"++HostName).
+config_nodename()->
+    ?ConfigNodeName.
 
 config_cookie()->
     list_to_atom(?ConfigCookieStr).

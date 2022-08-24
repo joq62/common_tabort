@@ -26,7 +26,7 @@
 start()->
     ok=setup(),
     
-    'config@c100'=common:config_node(),
+    "config"=common:config_nodename(),
     config=common:config_cookie(),
     
    
