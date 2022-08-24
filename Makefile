@@ -1,7 +1,7 @@
 all:
 	rm -rf  *~ */*~  src/*.beam test/*.beam erl_cra*;
 	rm -rf  Mnesia.* host_specs deployment_specs logs *.service_dir;
-	rm -rf _build test_ebin ebin;		
+	rm -rf _build test_ebin ebin rebar.lock;		
 	mkdir ebin;		
 	rebar3 compile;	
 	cp _build/default/lib/*/ebin/* ebin;
@@ -16,7 +16,7 @@ eunit:
 	rm -rf  *~ */*~ src/*.beam test/*.beam test_ebin erl_cra*;
 	rm -rf _build logs *.service_dir;
 	rm -rf  catalog host_specs deployment_specs;
-	rm -rf ebin;
+	rm -rf ebin  rebar.lock;
 	mkdir test_ebin;
 	mkdir ebin;
 	rebar3 compile;
