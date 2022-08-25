@@ -35,7 +35,7 @@
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% --------------------------------------------------------------------
--define(NodeNames,["h200","h201","h202"]).
+-define(NodeNames,["vm0","vm1","vm2"]).
 get_nodenames()->
     ?NodeNames.    
 get_nodes()->
