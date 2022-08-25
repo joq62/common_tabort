@@ -2,10 +2,29 @@
 
 
 
--export([r/2
+-export([r/2,
+	 dir/2,
+	 dir_r/2
 	]).
 
 
+%% --------------------------------------------------------------------
+%% Function:mapreduce/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% --------------------------------------------------------------------
+dir_r(Node,Dir)->
+    
+    ok.
+
+
+%% --------------------------------------------------------------------
+%% Function:mapreduce/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% --------------------------------------------------------------------
+dir(Node,Dir)->
+    r(Node,Dir).
 %% --------------------------------------------------------------------
 %% Function:mapreduce/0 
 %% Description: Initiate the eunit tests, set upp needed processes etc
