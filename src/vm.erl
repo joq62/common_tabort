@@ -18,6 +18,8 @@
 %% --------------------------------------------------------------------
 %-compile(export_all).
 -export([
+	 check_started_node/1,
+	 check_stopped_node/1,
 	 check_started_node/3,
 	 check_stopped_node/3,
 
@@ -215,6 +217,10 @@ ssh_create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% --------------------------------------------------------------------
+check_stopped_node(Node)->
+    N=50,
+    check_stopped_node(N,Node,false).
+
 check_stopped_node(_N,_Node,true)->
     true;
 check_stopped_node(0,_Node,Boolean) ->
@@ -234,6 +240,9 @@ check_stopped_node(N,Node,_) ->
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% --------------------------------------------------------------------
+check_started_node(Node)->
+    N=50,
+    check_started_node(N,Node,false).
 
 check_started_node(_N,_Node,true)->
     true;
