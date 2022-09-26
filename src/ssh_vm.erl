@@ -59,7 +59,7 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
     SshPort=config:host_ssh_port(HostName),
     Uid=config:host_uid(HostName),
     Pwd=config:host_passwd(HostName),
-    TimeOut=5000,
+    TimeOut=7000,
     
     Node=list_to_atom(NodeName++"@"++HostName),
     rpc:call(Node,init,stop,[],5000),
