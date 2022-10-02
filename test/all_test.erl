@@ -26,6 +26,7 @@ start()->
     ok=config_test:start(),
     ok=map_test(),
     ok=list_len(),
+    ok=list_duplicates(),
     ok=local_vm_test:start(),
     ok=ssh_vm_test:start(),
     io:format("TEST OK there you go!! ~p~n",[?MODULE]),
@@ -38,6 +39,11 @@ start()->
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
+list_duplicates()->
+    A=[a,b,2,b,"b",3,4,2,a,a,"c",5,"b",{1,2,3},{1,2,3}],
+    [a,b,2,"b",3,4,"c",5,{1,2,3}]=list_duplicates:remove(A),
+    io:format("TEST OK! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
+    ok.
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
