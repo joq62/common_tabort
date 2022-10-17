@@ -78,6 +78,7 @@ start_node(HostName,NodeName,Cookie,EnvArgs)->
 			  {ok,CreatedNode}
 		  end;
 	      UnMatched ->
+		  io:format("UnMatched ~p~n",[{UnMatched,?MODULE,?FUNCTION_NAME}]),
 		  {error,UnMatched}
 	  end,
   %  io:format("Reply ~p~n",[{Reply,?MODULE,?FUNCTION_NAME}]),
