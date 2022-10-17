@@ -69,7 +69,8 @@ start_node(HostName,NodeName,Cookie,EnvArgs)->
 		   {error,[{?MODULE,?LINE," ",badrpc,Reason,HostName,NodeName,Cookie}]};
 	      {error,Reason}->
 		  {error,[HostName,NodeName,Cookie,Reason]};
-	      _->
+	      UnMatched->
+		  io:format("UnMatched ~p~n",[{UnMatched,?MODULE,?FUNCTION_NAME}]),
      		  CreatedNode=list_to_atom(NodeName++"@"++HostName),
 		  case vm:check_started_node(CreatedNode) of
 		      false->
