@@ -69,14 +69,16 @@ start_node(HostName,NodeName,Cookie,EnvArgs)->
 		   {error,[{?MODULE,?LINE," ",badrpc,Reason,HostName,NodeName,Cookie}]};
 	      {error,Reason}->
 		  {error,[HostName,NodeName,Cookie,Reason]};
-	      []->
+	      ok->
      		  CreatedNode=list_to_atom(NodeName++"@"++HostName),
 		  case vm:check_started_node(CreatedNode) of
 		      false->
 			  {error,[couldnt_start_node,CreatedNode,HostName,NodeName,Cookie]};
 		      true ->
 			  {ok,CreatedNode}
-		  end
+		  end;
+	      UnMatched ->
+		  {error,UnMatched}
 	  end,
   %  io:format("Reply ~p~n",[{Reply,?MODULE,?FUNCTION_NAME}]),
     erlang:set_cookie(node(),CurrentCookie),
