@@ -55,10 +55,10 @@ create(HostName,NodeName,{Ip,SshPort,Uid,Pwd,TimeOut})->
 %% Returns: non
 %% -------------------------------------------------------------------	
 create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
-    Ip=config:host_local_ip(HostName),
-    SshPort=config:host_ssh_port(HostName),
-    Uid=config:host_uid(HostName),
-    Pwd=config:host_passwd(HostName),
+    Ip=config_node:host_local_ip(HostName),
+    SshPort=config_node:host_ssh_port(HostName),
+    Uid=config_node:host_uid(HostName),
+    Pwd=config_node:host_passwd(HostName),
     TimeOut=7000,
     
     Node=list_to_atom(NodeName++"@"++HostName),
@@ -119,10 +119,10 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
 %% Returns: non
 %% --------------------------------------------------------------------
 delete_dir(HostName,Dir)->
-    Ip=config:host_local_ip(HostName),
-    SshPort=config:host_ssh_port(HostName),
-    Uid=config:host_uid(HostName),
-    Pwd=config:host_passwd(HostName),
+    Ip=config_node:host_local_ip(HostName),
+    SshPort=config_node:host_ssh_port(HostName),
+    Uid=config_node:host_uid(HostName),
+    Pwd=config_node:host_passwd(HostName),
     TimeOut=5000,
     my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"rm -rf "++Dir,TimeOut),
     case ssh_vm:is_dir(Dir,{Ip,SshPort,Uid,Pwd,TimeOut}) of
@@ -139,10 +139,10 @@ delete_dir(HostName,Dir)->
 %% --------------------------------------------------------------------
 create_dir(HostName,Dir)->
     
-    Ip=config:host_local_ip(HostName),
-    SshPort=config:host_ssh_port(HostName),
-    Uid=config:host_uid(HostName),
-    Pwd=config:host_passwd(HostName),
+    Ip=config_node:host_local_ip(HostName),
+    SshPort=config_node:host_ssh_port(HostName),
+    Uid=config_node:host_uid(HostName),
+    Pwd=config_node:host_passwd(HostName),
     TimeOut=5000,
     my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"rm -rf "++Dir,TimeOut),
     my_ssh:ssh_send(Ip,SshPort,Uid,Pwd,"mkdir "++Dir,TimeOut),
