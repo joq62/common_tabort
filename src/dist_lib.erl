@@ -53,10 +53,10 @@ start_node(HostName,NodeName,Cookie,EnvArgs)->
     CurrentCookie=erlang:get_cookie(),
     erlang:set_cookie(node(),list_to_atom(Cookie)),
    
-    Ip=config:host_local_ip(HostName),
-    SshPort=config:host_ssh_port(HostName),
-    Uid=config:host_uid(HostName),
-    Pwd=config:host_passwd(HostName),
+    Ip=config_node:host_local_ip(HostName),
+    SshPort=config_node:host_ssh_port(HostName),
+    Uid=config_node:host_uid(HostName),
+    Pwd=config_node:host_passwd(HostName),
     TimeOut=?SSH_TIMEOUT,
  
 
@@ -125,7 +125,7 @@ git_clone(Node,Cookie,AppId,DirToClone)->
     CurrentCookie=erlang:get_cookie(),
     erlang:set_cookie(node(),list_to_atom(Cookie)),
 
-    Reply=case config:application_gitpath(AppId) of
+    Reply=case config_node:application_gitpath(AppId) of
 		{error,Reason}->
 		    {error,[AppId,Reason]};
 		GitPath->
