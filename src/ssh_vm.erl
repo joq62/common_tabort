@@ -55,7 +55,7 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
     create(HostName,NodeName,Cookie,PaArgs,EnvArgs,7000).    
 
 create(HostName,NodeName,Cookie,PaArgs,EnvArgs,TimeOut)->    
-    io:format(" ~p~n",[{?MODULE,?LINE,?FUNCTION_NAME,HostName,Cookie,NodeName,PaArgs,EnvArgs,TimeOut}]),
+  %  io:format(" ~p~n",[{?MODULE,?LINE,?FUNCTION_NAME,HostName,Cookie,NodeName,PaArgs,EnvArgs,TimeOut}]),
     Ip=config_node:host_local_ip(HostName),
     SshPort=config_node:host_ssh_port(HostName),
     Uid=config_node:host_uid(HostName),
@@ -78,8 +78,6 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
     true=check_stopped_node(100,Node,false),
     Args=PaArgs++" "++"-setcookie "++Cookie++" "++EnvArgs,
     Msg="erl -sname "++NodeName++" "++Args++" ",
-
- 
     Result=case rpc:call(node(),my_ssh,ssh_send,[Ip,SshPort,Uid,Pwd,Msg,TimeOut],TimeOut-1000) of
 	       % {badrpc,timeout}-> retry X times       
 	       {badrpc,Reason}->
