@@ -25,9 +25,9 @@
 -export([
 	 delete/1,
 	 delete/2,
-	 create/3,
 	 create/5,
 	 create/6,
+	 create/7,
 
 	 is_dir/2
 	]).
@@ -43,33 +43,31 @@
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% -------------------------------------------------------------------	 
-create(HostName,NodeName,{Ip,SshPort,Uid,Pwd,TimeOut})->
-    Cookie=atom_to_list(erlang:get_cookie()),
-    PaArgs=" ",
-    EnvArgs=" ",
-    create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
-	   {Ip,SshPort,Uid,Pwd,TimeOut}).
-%% --------------------------------------------------------------------
-%% Function:start/0 
-%% Description: Initiate the eunit tests, set upp needed processes etc
-%% Returns: non
-%% -------------------------------------------------------------------	
-create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
-    Ip=config_node:host_local_ip(HostName),
-    SshPort=config_node:host_ssh_port(HostName),
-    Uid=config_node:host_uid(HostName),
-    Pwd=config_node:host_passwd(HostName),
-    TimeOut=7000,
-    create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
-	   {Ip,SshPort,Uid,Pwd,TimeOut}).
 
 %% --------------------------------------------------------------------
 %% Function:start/0 
 %% Description: Initiate the eunit tests, set upp needed processes etc
 %% Returns: non
 %% -------------------------------------------------------------------	
+
+
+create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
+    create(HostName,NodeName,Cookie,PaArgs,EnvArgs,7000).    
+
+create(HostName,NodeName,Cookie,PaArgs,EnvArgs,TimeOut)->    
+    Ip=config_node:host_local_ip(HostName),
+    SshPort=config_node:host_ssh_port(HostName),
+    Uid=config_node:host_uid(HostName),
+    Pwd=config_node:host_passwd(HostName),
+    create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
+	   {Ip,SshPort,Uid,Pwd},TimeOut).
+%% --------------------------------------------------------------------
+%% Function:start/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% -------------------------------------------------------------------	
 create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
-	   {Ip,SshPort,Uid,Pwd,TimeOut})->
+       {Ip,SshPort,Uid,Pwd},TimeOut)->
     true=erlang:set_cookie(node(), list_to_atom(Cookie)),   
    
     Node=list_to_atom(NodeName++"@"++HostName),
