@@ -60,28 +60,8 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
     Uid=config_node:host_uid(HostName),
     Pwd=config_node:host_passwd(HostName),
     TimeOut=7000,
-    
-    Node=list_to_atom(NodeName++"@"++HostName),
-    rpc:call(Node,init,stop,[],5000),
-    true=check_stopped_node(100,Node,false),
-    Args=PaArgs++" "++"-setcookie "++Cookie++" "++EnvArgs,
-    Msg="erl -sname "++NodeName++" "++Args++" ", 
-    
-    Result=case rpc:call(node(),my_ssh,ssh_send,[Ip,SshPort,Uid,Pwd,Msg,TimeOut],TimeOut-1000) of
-	     % {badrpc,timeout}-> retry X times       
-	       {badrpc,Reason}->
-		   {error,[{?MODULE,?LINE," ",badrpc,Reason}]};
-	       _Return->
-		   erlang:set_cookie(Node,list_to_atom(Cookie)),
-		   case check_started_node(100,Node,false) of
-		       false->
-			   rpc:call(Node,init,stop,[],5000),
-			   {error,[{?MODULE,?LINE," ",couldnt_connect,Node}]};
-		       true->
-			   {ok,Node}
-		   end
-	   end,
-    Result.
+    create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
+	   {Ip,SshPort,Uid,Pwd,TimeOut}).
 
 %% --------------------------------------------------------------------
 %% Function:start/0 
@@ -91,6 +71,7 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
 create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
 	   {Ip,SshPort,Uid,Pwd,TimeOut})->
     true=erlang:set_cookie(node(), list_to_atom(Cookie)),   
+   
     Node=list_to_atom(NodeName++"@"++HostName),
     rpc:call(Node,init,stop,[],5000),
     true=check_stopped_node(100,Node,false),
