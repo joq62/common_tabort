@@ -80,7 +80,7 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs,
     Msg="erl -sname "++NodeName++" "++Args++" ",
 
  
-    Result=case rpc:call(node(),my_ssh,ssh_send,[Ip,SshPort,Uid,Pwd,Msg,TimeOut],TimeOut+10) of
+    Result=case rpc:call(node(),my_ssh,ssh_send,[Ip,SshPort,Uid,Pwd,Msg,TimeOut],TimeOut) of
 	       % {badrpc,timeout}-> retry X times       
 	       {badrpc,Reason}->
 		   {error,[{?MODULE,?LINE," ",badrpc,Reason}]};
