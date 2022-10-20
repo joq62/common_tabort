@@ -65,7 +65,7 @@ create(HostName,NodeName,Cookie,PaArgs,EnvArgs)->
     rpc:call(Node,init,stop,[],5000),
     true=check_stopped_node(100,Node,false),
     Args=PaArgs++" "++"-setcookie "++Cookie++" "++EnvArgs,
-    Msg="erl -sname "++NodeName++" "++Args++" "++"-detached", 
+    Msg="erl -sname "++NodeName++" "++Args++" ", 
     
     Result=case rpc:call(node(),my_ssh,ssh_send,[Ip,SshPort,Uid,Pwd,Msg,TimeOut],TimeOut-1000) of
 	     % {badrpc,timeout}-> retry X times       
