@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc common top level supervisor.
+%% @doc config top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(common_sup).
+-module(config_sup).
 
 -behaviour(supervisor).
 
@@ -29,8 +29,8 @@ init([]) ->
     SupFlags = #{strategy => one_for_all,
                  intensity => 0,
                  period => 1},
-      ChildSpecs = [#{id=>common,
-		   start=>{common,start,[]}}],
+    ChildSpecs = [#{id=>config,
+		   start=>{config,start,[]}}],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions

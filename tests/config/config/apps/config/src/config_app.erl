@@ -1,16 +1,16 @@
 %%%-------------------------------------------------------------------
-%% @doc common public API
+%% @doc config public API
 %% @end
 %%%-------------------------------------------------------------------
 
--module(common_app).
+-module(config_app).
 
 -behaviour(application).
 
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
-    common_sup:start_link().
+    config_sup:start_link().
 
 stop(_State) ->
     ok.
